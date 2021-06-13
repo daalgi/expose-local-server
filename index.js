@@ -18,8 +18,16 @@ try {
 
 // Run localtunnel
 console.log("\nRunning local tunnel...")
-const port = process.env.LOCAL_HOST_PORT
-const subdomain = process.env.LOCAL_HOST_SUBDOMAIN
+// Get arguments `port` and `subdomain` if passed
+const args = process.argv.slice(2)
+let port, subdomain
+if (args.length > 0)
+    port = args[0]
+if (args.length > 1)
+    subdomain = args[1]
+if (!port)
+    port = process.env.LOCAL_HOST_PORT
+// If subdomain not passed, `localtunnel` provides a random one
 console.log(`Port: ${port}\nSubdomain: ${subdomain}\nExposing...`)
 
 let tunnelUrlYouWant = `https://${subdomain}.loca.lt`
@@ -27,9 +35,16 @@ let tunnelUrlYouWant = `https://${subdomain}.loca.lt`
 let tunnel = localtunnel({ port, subdomain }, err => {
     if (err) console.log(err)
 
-    if (tunnel.url !== tunnelUrlYouWant) {
+    if (tunnel.url !== tunnelUrlYouWant && subdomain) {
+        console.log(`"${subdomain}" not available. Trying to make a https request...`)
 
-        console.log(`"${subdomain}" not available. Running a random subdomain...`)
+        fetch(tunnelUrlYouWant)
+            .then(res => {
+                console.log(res)
+            })
+
+        if (tunnel.url !== tunnelUrlYouWant)
+            console.log(`"${subdomain}" not available. Running a random subdomain...`)
     }
 
     console.log(tunnel.url)

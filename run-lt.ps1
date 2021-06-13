@@ -1,5 +1,6 @@
+param ($port, $subdomain)
 while($true)
 {
-    lt --subdomain mysubdomain --port 8000
+    lt --subdomain $subdomain --port $port
     Start-Sleep -s 2
 }
